@@ -21,6 +21,9 @@ export default class LinkedPipesClient {
     const form = new FormData();
     form.append('input', data);
     form.append('options', JSON.stringify(JSON_MESSAGE));
+    form.append('pipeline', JSON.stringify({
+      "@id": pipeline
+    }));
     const url = `${this.endpoint}/resources/executions?pipeline=${pipeline}`;
     try {
       console.log("posting to linkedpipes");
