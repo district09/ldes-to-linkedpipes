@@ -1,0 +1,22 @@
+version: '3'
+services:
+  ldesclient:
+#    build: ./client
+    image: node:14
+    working_dir: /app
+    volumes:
+      - ./client:/app
+    command: "npm run dev"
+    networks:
+      - default
+      - linkedpipes
+    environment:
+      NODE_ENVIRONMENT: "development"
+      LDES_ENPOINT: https://apidg.gent.be/opendata/adlib2eventstream/v1/dmg/objecten
+      LINKED_PIPES_PIPELINE: http://localhost:9080/resources/pipelines/1623151530820
+      LINKED_PIPES_ENDPOINT: http://frontend:8080
+      LINKED_PIPES_AUTHORIZATION: ''
+networks:
+  linkedpipes:
+    external:
+      name: linkedpipes_default
