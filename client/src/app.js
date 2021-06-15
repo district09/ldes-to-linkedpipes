@@ -11,6 +11,7 @@ function main() {
   try {
     let options = {
       "pollingInterval": 500, // millis
+      "disablePolling": true,
       "mimeType": "application/ld+json",
       "fromTime": new Date("2021-02-03T15:46:12.307Z"),
       "emitMemberOnce": true,
