@@ -3,18 +3,46 @@ import fetch from 'node-fetch';
 import HTTPResponseError from './http-response-error';
 
 const JSON_MESSAGE = {
-  "@id": "http://localhost/base",
-  "@type" : "http://etl.linkedpipes.com/ontology/ExecutionOptions",
-  "http://linkedpipes.com/ontology/deleteWorkingData" : false,
-  "http://linkedpipes.com/ontology/saveDebugData" : true,
-  "http://linkedpipes.com/ontology/logPolicy" : {
-    "@id" : "http://linkedpipes.com/ontology/log/Preserve"
-  }
+      configuration: {
+        "@context": { "@vocab": "http://etl.linkedpipes.com/ontology/" },
+        "@id": "http://localhost/base",
+        "@type": "http://etl.linkedpipes.com/ontology/ExecutionOptions",
+        deleteWorkingData: true,
+        saveDebugData: false,
+        logPolicy: { "@id":"http://linkedpipes.com/ontology/log/DeleteOnSuccess" }
+      }
 };
+
 const MAX_TRIES = 5;
 export default class LinkedPipesClient {
   constructor(endpoint) {
     this.endpoint = endpoint;
+  }
+
+  async runPipeline(pipeline, tries = 0) {
+    const url = `${this.endpoint}/resources/executions?pipeline=${pipeline}`;
+    try {
+      const result = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(JSON_MESSAGE),
+        contentType: "application/json"
+      });
+      if (!result.ok) {
+        throw new HTTPResponseError(result);
+      }
+      return result;
+    }
+    catch(e) {
+      if (tries < MAX_TRIES) {
+        console.error(e);
+        console.log(`retrying to run pipeline ${MAX_TRIES-tries} more times`);
+        return this.runPipeline(pipeline, tries + 1);
+      }
+      else {
+        console.error(e);
+        throw e;
+      }
+    }
   }
 
   async postData(pipeline, data, tries = 0) {

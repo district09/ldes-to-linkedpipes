@@ -1,7 +1,15 @@
 import { newEngine } from '@treecg/actor-init-ldes-client';
-import { LINKED_PIPES_ENDPOINT, LINKED_PIPES_PIPELINE, LDES_ENDPOINT }  from './config';
+import {
+  LINKED_PIPES_ENDPOINT,
+  LINKED_PIPES_PIPELINE,
+  LDES_ENDPOINT,
+  DIRECT_PUSH,
+  OUTPUT_FOLDER
+}  from './config';
 import LinkedPipesClient from './linked-pipes-client';
 import HTTPResponseError from './http-response-error';
+import path from 'path';
+import writeFileSync from 'fs';
 
 main();
 
@@ -10,7 +18,8 @@ const lpClient = new LinkedPipesClient(LINKED_PIPES_ENDPOINT);
 function main() {
   try {
     let options = {
-      "disablePolling": true,
+      "pollingInterval": 500,
+      "disablePolling": ! DIRECT_PUSH,
       "mimeType": "application/ld+json",
       "fromTime": new Date("2021-02-03T15:46:12.307Z"),
       "emitMemberOnce": true,
@@ -33,8 +42,16 @@ function main() {
     eventstreamSync.on('data', async (data) => {
       console.log("received data");
       try {
-        const result = await lpClient.postData(LINKED_PIPES_PIPELINE, data);
-        console.log(await result.text());
+        if (DIRECT_PUSH) {
+          const result = await lpClient.postData(LINKED_PIPES_PIPELINE, data);
+          console.log(await result.text());
+        }
+        else {
+          // write to configured folder
+          const now = new Date();
+          const filename = path.join(OUTPUT_FOLDER, `${now.toString().jsonld}`);
+          writeFileSync(path, data, { encoding: 'utf-8'});
+        }
       }
       catch(e) {
         console.error('something went wrong posting to linkedpipes',e);
@@ -43,6 +60,9 @@ function main() {
     });
     eventstreamSync.on('end', () => {
       console.log("No more data!");
+      if (! DIRECT_PUSH) {
+        lpClient.runPipeline(LINKED_PIPES_PIPELINE);
+      }
     });
   } catch (e) {
     console.error(e);

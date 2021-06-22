@@ -1,12 +1,12 @@
 version: '3'
 services:
   ldesclient:
-#    build: ./client
-    image: node:14
+    build: ./client
+#    image: node:14
     working_dir: /app
     volumes:
       - ./client:/app
-    command: "npm run dev"
+#    command: "run dev"
     networks:
       - default
       - linkedpipes
@@ -16,6 +16,8 @@ services:
       LINKED_PIPES_PIPELINE: http://localhost:9080/resources/pipelines/1623151530820
       LINKED_PIPES_ENDPOINT: http://frontend:8080
       LINKED_PIPES_AUTHORIZATION: ''
+      DIRECT_PUSH: "false"
+      OUTPUT_FOLDER: "/data"
 networks:
   linkedpipes:
     external:
