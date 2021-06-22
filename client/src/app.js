@@ -10,16 +10,15 @@ const lpClient = new LinkedPipesClient(LINKED_PIPES_ENDPOINT);
 function main() {
   try {
     let options = {
-      "pollingInterval": 500, // millis
       "disablePolling": true,
       "mimeType": "application/ld+json",
       "fromTime": new Date("2021-02-03T15:46:12.307Z"),
       "emitMemberOnce": true,
       "jsonLdContext": {
-        "@context": [
-          "https://data.vlaanderen.be/doc/applicatieprofiel/cultureel-erfgoed-object/kandidaatstandaard/2020-07-17/context/cultureel-erfgoed-object-ap.jsonld",
-          "https://data.vlaanderen.be/context/persoon-basis.jsonld",
-          "https://brechtvdv.github.io/demo-data/cultureel-erfgoed-event-ap.jsonld",
+       "@context": [
+         "https://raw.githubusercontent.com/StadGent/node_service_eventstream-api/master/src/public/context/persoon-basis.jsonld",
+         "https://raw.githubusercontent.com/StadGent/node_service_eventstream-api/master/src/public/context/cultureel-erfgoed-event-ap.jsonld",
+         "https://raw.githubusercontent.com/StadGent/node_service_eventstream-api/master/src/public/context/cultureel-erfgoed-object-ap.jsonld",
           {
             "dcterms:isVersionOf": {
               "@type": "@id"
