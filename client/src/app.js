@@ -9,34 +9,37 @@ import {
 import LinkedPipesClient from './linked-pipes-client';
 import HTTPResponseError from './http-response-error';
 import path from 'path';
-import writeFileSync from 'fs';
+import { writeFileSync } from 'fs';
 
 main();
 
 const lpClient = new LinkedPipesClient(LINKED_PIPES_ENDPOINT);
 
 function main() {
+  let options = {
+    "disablePolling": ! DIRECT_PUSH,
+    "mimeType": "application/ld+json",
+    "fromTime": new Date("2021-02-03T15:46:12.307Z"),
+    "emitMemberOnce": true,
+    "jsonLdContext": {
+      "@context": [
+        "https://raw.githubusercontent.com/StadGent/node_service_eventstream-api/master/src/public/context/persoon-basis.jsonld",
+        "https://raw.githubusercontent.com/StadGent/node_service_eventstream-api/master/src/public/context/cultureel-erfgoed-event-ap.jsonld",
+        "https://raw.githubusercontent.com/StadGent/node_service_eventstream-api/master/src/public/context/cultureel-erfgoed-object-ap.jsonld",
+        {
+          "dcterms:isVersionOf": {
+            "@type": "@id"
+          },
+          "prov": "http://www.w3.org/ns/prov#"
+        }
+      ]
+    }
+  };
+  if (DIRECT_PUSH) {
+    options.pollingInterval = 500;
+  }
+  console.log('starting ldes client with options', options);
   try {
-    let options = {
-      "pollingInterval": 500,
-      "disablePolling": ! DIRECT_PUSH,
-      "mimeType": "application/ld+json",
-      "fromTime": new Date("2021-02-03T15:46:12.307Z"),
-      "emitMemberOnce": true,
-      "jsonLdContext": {
-       "@context": [
-         "https://raw.githubusercontent.com/StadGent/node_service_eventstream-api/master/src/public/context/persoon-basis.jsonld",
-         "https://raw.githubusercontent.com/StadGent/node_service_eventstream-api/master/src/public/context/cultureel-erfgoed-event-ap.jsonld",
-         "https://raw.githubusercontent.com/StadGent/node_service_eventstream-api/master/src/public/context/cultureel-erfgoed-object-ap.jsonld",
-          {
-            "dcterms:isVersionOf": {
-              "@type": "@id"
-            },
-            "prov": "http://www.w3.org/ns/prov#"
-          }
-        ]
-      }
-    };
     let LDESClient = new newEngine();
     let eventstreamSync = LDESClient.createReadStream(LDES_ENDPOINT, options);
     eventstreamSync.on('data', async (data) => {
@@ -49,8 +52,8 @@ function main() {
         else {
           // write to configured folder
           const now = new Date();
-          const filename = path.join(OUTPUT_FOLDER, `${now.toString().jsonld}`);
-          writeFileSync(path, data, { encoding: 'utf-8'});
+          const filename = path.join(OUTPUT_FOLDER, `${now.getTime()}.jsonld`);
+          writeFileSync(filename, data, { encoding: 'utf-8'});
         }
       }
       catch(e) {
