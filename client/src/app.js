@@ -1,3 +1,6 @@
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+
 import { newEngine } from '@treecg/actor-init-ldes-client';
 import {
   LINKED_PIPES_ENDPOINT,
