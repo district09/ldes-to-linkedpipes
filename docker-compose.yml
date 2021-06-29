@@ -2,11 +2,8 @@ version: '3'
 services:
   ldesclient:
     build: ./client
-#    image: node:14
+    image: node:14
     working_dir: /app
-    volumes:
-      - ./client:/app
-#    command: "run dev"
     networks:
       - default
       - linkedpipes
@@ -18,6 +15,8 @@ services:
       LINKED_PIPES_AUTHORIZATION: ''
       DIRECT_PUSH: "false"
       OUTPUT_FOLDER: "/data"
+    volumes:
+      - ./data:/data
 networks:
   linkedpipes:
     external:
