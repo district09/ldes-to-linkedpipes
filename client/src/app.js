@@ -11,8 +11,9 @@ import {
 }  from './config';
 import LinkedPipesClient from './linked-pipes-client';
 import HTTPResponseError from './http-response-error';
+import skolemizeAndWriteData from './skolemizing-ldes-writer';
 import path from 'path';
-import { writeFileSync } from 'fs';
+
 
 main();
 
@@ -33,7 +34,7 @@ function main() {
           "dcterms:isVersionOf": {
             "@type": "@id"
           },
-          "prov": "http://www.w3.org/ns/prov#"
+          "prov": "http://www.w3.org/ns/prov#",
         }
       ]
     }
@@ -46,17 +47,15 @@ function main() {
     let LDESClient = new newEngine();
     let eventstreamSync = LDESClient.createReadStream(LDES_ENDPOINT, options);
     eventstreamSync.on('data', async (data) => {
-      console.log("received data");
       try {
         if (DIRECT_PUSH) {
           const result = await lpClient.postData(LINKED_PIPES_PIPELINE, data);
           console.log(await result.text());
         }
         else {
-          // write to configured folder
           const now = new Date();
-          const filename = path.join(OUTPUT_FOLDER, `${now.getTime()}.jsonld`);
-          writeFileSync(filename, data, { encoding: 'utf-8'});
+          const filename = path.join(OUTPUT_FOLDER, `${now.getTime()}.nt`);
+          skolemizeAndWriteData(data, filename);
         }
       }
       catch(e) {

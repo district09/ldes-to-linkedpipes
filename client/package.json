@@ -13,11 +13,14 @@
   "license": "MIT",
   "dependencies": {
     "@babel/preset-env": "^7.14.7",
+    "@rdfjs/parser-jsonld": "^1.2.1",
     "@treecg/actor-init-ldes-client": "^2.3.2",
     "core-js": "^3.15.1",
+    "n3": "^1.11.1",
     "node-fetch": "^2.6.1",
     "nodemon": "^2.0.7",
-    "regenerator-runtime": "^0.13.7"
+    "regenerator-runtime": "^0.13.7",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
