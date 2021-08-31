@@ -41,7 +41,7 @@ function getUriForBlank(map, blankNode) {
   // note using blankNode.value atm
   let uri = map.get(blankNode.value);
   if (!uri) {
-    uri = factory.namedNode(`https://stad.gent/id/.well-known/skolem/{uuid()}`);
+    uri = factory.namedNode(`https://stad.gent/id/.well-known/skolem/${uuid()}`);
     map.set(blankNode.value, uri);
   }
   return uri;
