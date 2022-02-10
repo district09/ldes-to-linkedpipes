@@ -12,19 +12,20 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@babel/preset-env": "^7.14.7",
-    "@rdfjs/parser-jsonld": "^1.2.1",
-    "@treecg/actor-init-ldes-client": "^2.3.2",
-    "core-js": "^3.15.1",
-    "n3": "^1.11.1",
+    "@babel/preset-env": "^7.16.11",
+    "@rdfjs/parser-jsonld": "1.2.1",
+    "@treecg/actor-init-ldes-client": "^2.5.8",
+    "core-js": "^3.21.0",
+    "digest-fetch": "^1.2.1",
+    "n3": "^1.13.0",
     "node-fetch": "^2.6.1",
-    "nodemon": "^2.0.7",
-    "regenerator-runtime": "^0.13.7",
+    "nodemon": "^2.0.15",
+    "regenerator-runtime": "^0.13.9",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.14.5",
-    "@babel/core": "^7.14.6",
-    "@babel/node": "^7.14.7"
+    "@babel/cli": "^7.17.0",
+    "@babel/core": "^7.17.2",
+    "@babel/node": "^7.16.8"
   }
 }

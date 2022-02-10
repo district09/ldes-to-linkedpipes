@@ -5,19 +5,31 @@ import { newEngine } from '@treecg/actor-init-ldes-client';
 import {
   LINKED_PIPES_ENDPOINT,
   LINKED_PIPES_PIPELINE,
+  GRAPH_STORE_ENDPOINT,
+  GRAPH_STORE_USER,
+  GRAPH_STORE_PASSWORD,
+  GRAPH_STORE_GRAPH,
   LDES_ENDPOINT,
   DIRECT_PUSH,
   OUTPUT_FOLDER
 }  from './config';
+import SPARQLCrudClient from './sparql-crud-client';
 import LinkedPipesClient from './linked-pipes-client';
 import HTTPResponseError from './http-response-error';
-import skolemizeAndWriteData from './skolemizing-ldes-writer';
+import skolemizeAndWriteData, {skolemizeData} from './skolemizing-ldes-writer';
 import path from 'path';
 
 
 main();
 
-const lpClient = new LinkedPipesClient(LINKED_PIPES_ENDPOINT);
+let virtClient;
+let lpClient;
+if (DIRECT_PUSH) {
+  virtClient = new SPARQLCrudClient(GRAPH_STORE_ENDPOINT, GRAPH_STORE_USER,GRAPH_STORE_PASSWORD);
+}
+else {
+  lpClient = new LinkedPipesClient(LINKED_PIPES_ENDPOINT);
+}
 
 function main() {
   let options = {
@@ -40,7 +52,8 @@ function main() {
     }
   };
   if (DIRECT_PUSH) {
-    options.pollingInterval = 500;
+    options.pollingInterval = 60000;
+    virtClient.delete(GRAPH_STORE_GRAPH);
   }
   console.log('starting ldes client with options', options);
   try {
@@ -49,7 +62,9 @@ function main() {
     eventstreamSync.on('data', async (data) => {
       try {
         if (DIRECT_PUSH) {
-          const result = await lpClient.postData(LINKED_PIPES_PIPELINE, data);
+          const triples = await skolemizeData(data);
+          const result = await  virtClient.put(GRAPH_STORE_GRAPH, triples);
+          // const result = await lpClient.postData(LINKED_PIPES_PIPELINE, triples);
           console.log(await result.text());
         }
         else {
