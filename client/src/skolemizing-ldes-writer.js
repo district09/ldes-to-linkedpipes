@@ -5,36 +5,48 @@ import { writeFileSync } from 'fs';
 import { v4 as uuid } from 'uuid';
 import ParserJsonld from '@rdfjs/parser-jsonld';
 
-export default function skolemizeAndWriteData(data, filename) {
-  const parser = new ParserJsonld();
-  const writer = new WriterN3();
-  const dataset = factory.dataset();
-  const blankToUriMap = new Map();
-  const input =  new Readable({
-    read: () => {
-      input.push(data);
-      input.push(null);
-    }
-  });
-
-  const output = parser.import(input);
-
-  output.on('data', (quad) => {
-    if (quad) {
-      if (quad.subject.termType == "BlankNode") {
-        quad.subject = getUriForBlank(blankToUriMap, quad.subject);
+export function skolemizeData(data) {
+  return new Promise((resolve, reject) => {
+    const parser = new ParserJsonld();
+    const writer = new WriterN3();
+    const dataset = factory.dataset();
+    const blankToUriMap = new Map();
+    const input =  new Readable({
+      read: () => {
+        input.push(data);
+        input.push(null);
       }
-      if (quad.object.termType == "BlankNode") {
-        quad.object = getUriForBlank(blankToUriMap, quad.object);
+    });
+
+    const output = parser.import(input);
+    output.on('data', (quad) => {
+      if (quad) {
+        if (quad.subject.termType == "BlankNode") {
+          quad.subject = getUriForBlank(blankToUriMap, quad.subject);
+        }
+        if (quad.object.termType == "BlankNode") {
+          quad.object = getUriForBlank(blankToUriMap, quad.object);
+        }
+        writer.addQuad(quad);
       }
-      writer.addQuad(quad);
-    }
+    });
+    output.on('error', (error) => console.error(error));
+    output.on('end', () => {
+      writer.end((error, result) => {
+        if (error) {
+          reject(error);
+        }
+        else {
+          resolve(result);
+        }
+      });
+    });
   });
-  output.on('error', (error) => console.error(error));
-  output.on('end', () => {
-    console.log(`writing to ${filename}`);
-    writer.end((error, result) => writeFileSync(filename, result, { encoding: 'utf-8'}));
-  });
+}
+
+export default async function skolemizeAndWriteData(data, filename) {
+  const triples = await skolemizeData(data);
+  writeFileSync(filename, triples, { encoding: 'utf-8'});
 }
 
 function getUriForBlank(map, blankNode) {

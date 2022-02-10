@@ -11,7 +11,7 @@ import {
 }  from './config';
 import LinkedPipesClient from './linked-pipes-client';
 import HTTPResponseError from './http-response-error';
-import skolemizeAndWriteData from './skolemizing-ldes-writer';
+import skolemizeAndWriteData, {skolemizeData} from './skolemizing-ldes-writer';
 import path from 'path';
 
 
@@ -49,7 +49,8 @@ function main() {
     eventstreamSync.on('data', async (data) => {
       try {
         if (DIRECT_PUSH) {
-          const result = await lpClient.postData(LINKED_PIPES_PIPELINE, data);
+          const triples = await skolemizeData(data);
+          const result = await lpClient.postData(LINKED_PIPES_PIPELINE, triples);
           console.log(await result.text());
         }
         else {
