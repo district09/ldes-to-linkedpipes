@@ -19,9 +19,6 @@ import HTTPResponseError from './http-response-error';
 import skolemizeAndWriteData, {skolemizeData} from './skolemizing-ldes-writer';
 import path from 'path';
 
-
-main();
-
 let virtClient;
 let lpClient;
 if (DIRECT_PUSH) {
@@ -30,6 +27,8 @@ if (DIRECT_PUSH) {
 else {
   lpClient = new LinkedPipesClient(LINKED_PIPES_ENDPOINT);
 }
+
+main();
 
 function main() {
   let options = {
@@ -63,7 +62,7 @@ function main() {
       try {
         if (DIRECT_PUSH) {
           const triples = await skolemizeData(data);
-          const result = await  virtClient.put(GRAPH_STORE_GRAPH, triples);
+          const result = await  virtClient.post(GRAPH_STORE_GRAPH, triples);
           console.log(await result.text());
         }
         else {
