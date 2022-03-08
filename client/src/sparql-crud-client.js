@@ -10,10 +10,10 @@ export default class GraphStoreClient {
       this.client = new DigestFetch(username, password);
   }
 
-  async put(graph, body) {
+  async post(graph, body) {
     const url = `${this.endpoint}graph-uri=${encodeURIComponent(graph)}`;
     return await this.client.fetch(url, {
-      method: 'PUT',
+      method: 'POST',
       headers: {
         "Content-Type": "text/turtle"
       },
@@ -30,7 +30,7 @@ export default class GraphStoreClient {
       }
     });
   }
-  async post(graph, body) {
+  async put(graph, body) {
     await this.delete(graph);
     return await this.put(graph,triples);
   }
