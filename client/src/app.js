@@ -64,7 +64,6 @@ function main() {
         if (DIRECT_PUSH) {
           const triples = await skolemizeData(data);
           const result = await  virtClient.put(GRAPH_STORE_GRAPH, triples);
-          // const result = await lpClient.postData(LINKED_PIPES_PIPELINE, triples);
           console.log(await result.text());
         }
         else {
