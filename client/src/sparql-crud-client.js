@@ -32,6 +32,6 @@ export default class GraphStoreClient {
   }
   async put(graph, body) {
     await this.delete(graph);
-    return await this.put(graph,triples);
+    return await this.put(graph,body);
   }
 }
