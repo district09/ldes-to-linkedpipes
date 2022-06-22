@@ -64,6 +64,7 @@ function main() {
           const triples = await skolemizeData(data);
           const result = await  virtClient.post(GRAPH_STORE_GRAPH, triples);
           console.log(await result.text());
+          await timeout(1000);
         }
         else {
           const now = new Date();
@@ -85,4 +86,8 @@ function main() {
   } catch (e) {
     console.error(e);
   }
+}
+
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
